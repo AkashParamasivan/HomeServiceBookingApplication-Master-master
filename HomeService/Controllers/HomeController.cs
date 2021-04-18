@@ -1,10 +1,12 @@
 ﻿using HomeService.Models;
+using HomeService.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -107,22 +109,32 @@ namespace HomeService.Controllers
                 return RedirectToAction("Login");
                 }   
 
-                Role role = new Role();
+                User user = new User();
                 using (var httpClient = new HttpClient())
                 {
                     httpClient.BaseAddress = new Uri("https://localhost:44322/");
-                    using (var response = await httpClient.GetAsync("/api/Users/role/" + username))
+                    using (var response = await httpClient.GetAsync("/api/Users/Username/" + username))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        role = JsonConvert.DeserializeObject<Role>(apiResponse);
+                        user = JsonConvert.DeserializeObject<User>(apiResponse);
                     }
-                    if (role.role == null)
-                    {
+                if (user.Role.ToLower() == "user")
+                {
+                    TempData["UserDetails"] = JsonConvert.SerializeObject(user);
+                    HttpContext.Session.SetString("IsUserLoggedin", "user");
 
-                    }
-                    if (role.role.ToLower() == "admin")
+                    return RedirectToAction("Index", "Users");
+                }
+                if (user.Role.ToLower() == "provider")
+                {
+                    TempData["ProviderDetails"] = JsonConvert.SerializeObject(user);
+                    HttpContext.Session.SetString("IsProviderLoggedin", "Provider");
+                    return RedirectToAction("Index", "ServiceProvider");
+                }
+                if (user.Role.ToLower() == "admin")
                     {
-                        return RedirectToAction("Index", "Admin", new { role.role });
+                    HttpContext.Session.SetString("IsAdminLoggedin", "admin");
+                    return RedirectToAction("Index", "Admin");
                     }
                 }
                 return RedirectToAction("Login", "Home");
@@ -177,7 +189,20 @@ namespace HomeService.Controllers
                 }
 
             }
-            if (validateName.Usid != null)
+            if (validateName!= null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+
+        public bool DateValidation(Booking booking)
+        {
+            if(booking.Servicedate<DateTime.Today)
             {
                 return false;
             }
@@ -192,7 +217,7 @@ namespace HomeService.Controllers
             
             return View();
         }
-        public IActionResult SentMail()
+        /*public IActionResult SentMail()
         {
             MailMessage msg = new MailMessage();
             msg.From = new MailAddress("wirenethomeservices@gmail.com");
@@ -211,16 +236,19 @@ namespace HomeService.Controllers
             
             smt.Send(msg);
             return RedirectToAction("Login");
-        }
-        public IActionResult Privacy()
+        }*/
+        public ActionResult DisplayMessage(string msg, string act, string ctrl, bool isinput, string id = "")
         {
-            return View();
+            Message message = new Message();
+            message.DispalyMessage = msg;
+            message.ToAction = act;
+            message.ToControl = ctrl;
+            message.IsInput = isinput;
+            message.Id = id;
+            message.Inputdata = "Invalid Credentials";
+            return View(message);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        
     }
 }

@@ -27,10 +27,19 @@ namespace UsersAPI.Controllers
         public IEnumerable<UserServiceInfo> GetUserServiceInfos()
         {
             _log4net.Info("Get User is Invoked");
-            return  _context.GetAllUsers();
+            return _context.GetAllUsers();
+        }
+        [HttpGet("getusers")]
+        public IActionResult Users()
+        {
+            return Ok(_context.GetUsers());
+        }
+        [HttpGet("providers")]
+        public IActionResult Providers()
+        {
+            return Ok(_context.GetAllProviders());
         }
         [HttpGet("{id}")]
-
         public IActionResult Get(string id)
         {
             _log4net.Info("Get by id is called!");
@@ -49,17 +58,7 @@ namespace UsersAPI.Controllers
 
             return Ok(tempbill);
         }
-        [HttpGet("role/{uname}")]
-        public IActionResult GetUserRole(string uname)
-        {
-            _log4net.Info("Get Role of" + uname + "is invoked");
-            Role role =  _context.GetUserRole(uname);
-            if (role == null)
-            {
-                return BadRequest();
-            }
-            return Ok(role);
-        }
+
         [HttpGet("Aadhaar/{Aadhaar}")]
         public IActionResult getAadhaar(string Aadhaar)
         {
@@ -90,12 +89,10 @@ namespace UsersAPI.Controllers
          public async Task<ActionResult<UserServiceInfo>> GetUserServiceInfo(string id)
          {
              var userServiceInfo = await _context.UserServiceInfos.FindAsync(id);
-
              if (userServiceInfo == null)
              {
                  return NotFound();
              }
-
              return userServiceInfo;
          }*/
 
@@ -108,7 +105,7 @@ namespace UsersAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var editedUser = await _context.EditUser(id,userServiceInfo);
+            var editedUser = await _context.EditUser(id, userServiceInfo);
 
             return Ok(editedUser);
         }
@@ -142,6 +139,6 @@ namespace UsersAPI.Controllers
             return Ok(deletedUser);
         }
 
-        
+
     }
 }

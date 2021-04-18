@@ -41,3 +41,6 @@ create table Booking(Bookingid int identity(1,1) primary key  ,CustomerId  varch
 
 
 
+
+
+truncate table booking

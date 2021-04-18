@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UsersAPI.Repository
 {
-    public class UserRepo: IUserRepo
+    public class UserRepo : IUserRepo
     {
         private readonly UsersContext _context;
 
@@ -23,16 +23,7 @@ namespace UsersAPI.Repository
             UserServiceInfo usr = _context.UserServiceInfos.Find(id);
             return usr;
         }
-        public Role GetUserRole(string uName)
-        {
-            UserServiceInfo user = _context.UserServiceInfos.FirstOrDefault(usr => usr.Username == uName);
-            Role role = new Role();
-            if (user!=null)
-            {
-                role.role = user.Role;
-            }
-            return role;
-        }
+
         public UserServiceInfo GetUserServiceInfoByUserName(string Username)
         {
             UserServiceInfo item = _context.UserServiceInfos.FirstOrDefault(usr => usr.Username == Username);
@@ -42,7 +33,7 @@ namespace UsersAPI.Repository
 
         public UserServiceInfo GetUserServiceInfoByAadhaar(string Aadhaar)
         {
-            UserServiceInfo item = _context.UserServiceInfos.FirstOrDefault(usr => usr.Aadhaarno == Aadhaar);
+            UserServiceInfo item = _context.UserServiceInfos.FirstOrDefault(usr => usr.Aadhaarno == Aadhaar && usr.Role != "admin");
 
             return item;
         }
@@ -57,6 +48,14 @@ namespace UsersAPI.Repository
         {
             return _context.UserServiceInfos.ToList();
         }
+        public IEnumerable<UserServiceInfo> GetAllProviders()
+        {
+            return _context.UserServiceInfos.Where(u => u.Role == "provider" && u.IsNewProvider == false).ToList();
+        }
+        public IEnumerable<UserServiceInfo> GetUsers()
+        {
+            return _context.UserServiceInfos.Where(u => u.Role == "user").ToList();
+        }
         public async Task<UserServiceInfo> PostUser(UserServiceInfo item)
         {
             UserServiceInfo Sp = null;
@@ -66,7 +65,8 @@ namespace UsersAPI.Repository
             }
             else
             {
-                Sp = new UserServiceInfo() {
+                Sp = new UserServiceInfo()
+                {
                     Usid = item.Username + "-" + item.Phoneno,
                     Username = item.Username,
                     Phoneno = item.Phoneno,
@@ -82,7 +82,7 @@ namespace UsersAPI.Repository
                     Costperhour = item.Costperhour,
                     Rating = item.Rating,
                     IsNewProvider = true,
-                    IsProvicedBooked=false
+                    IsProvicedBooked = false
                 };
                 await _context.UserServiceInfos.AddAsync(Sp);
                 await _context.SaveChangesAsync();
@@ -103,7 +103,7 @@ namespace UsersAPI.Repository
             }
             return sp;
         }
-        public async Task<UserServiceInfo> EditUser(string id,UserServiceInfo item)
+        public async Task<UserServiceInfo> EditUser(string id, UserServiceInfo item)
         {
             UserServiceInfo sp = await _context.UserServiceInfos.FindAsync(id);
             sp.Password = item.Password;
