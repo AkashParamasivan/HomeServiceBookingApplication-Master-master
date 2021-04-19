@@ -20,6 +20,22 @@ namespace BookingApi.Models
         public bool? Servicestatus { get; set; }
         public int? Rating { get; set; }
 
+        public Booking()
+        { }
+        public Booking(int bookid,string custid,string spid,DateTime sdate,int stime,int endtime ,int escost,bool bstatus,bool sstatus,int rating)
+        {
+            Bookingid = bookid;
+            CustomerId = custid;
+            ServiceProviderId = spid;
+            Servicedate = sdate;
+            Starttime = stime;
+            Endtime = endtime;
+            Estimatedcost = escost;
+            Bookingstatus = bstatus;
+            Servicestatus = sstatus;
+            Rating = rating;
+        }
+
         
     }
 }

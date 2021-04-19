@@ -41,6 +41,12 @@ create table Booking(Bookingid int identity(1,1) primary key  ,CustomerId  varch
 
 
 
+select * from SpecificationTable
 
+select * from SpecificationTable
+
+select * from UserServiceInfo 
+
+select * from Booking
 
 truncate table booking

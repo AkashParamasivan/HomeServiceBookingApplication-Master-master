@@ -15,6 +15,11 @@ namespace ServiceBookingJwt.Controllers
     {
        static readonly log4net.ILog _log4net = log4net.LogManager.GetLogger(typeof(AuthenticationController));
         private readonly IAuthenticationManager manager;
+
+        public AuthenticationController()
+        {
+
+        }
         public AuthenticationController(IAuthenticationManager manager)
         {
             this.manager = manager;
